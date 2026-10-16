@@ -1,4 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">CB Widgets</string>
+
+    <string name="widget_clock_digital_label">Digital Clock</string>
+    <string name="widget_clock_digital_desc">Bold digital time with the weekday and date. Follows your 12/24-hour setting.</string>
+    <string name="widget_clock_minimal_label">Minimal Clock</string>
+    <string name="widget_clock_minimal_desc">Just the time, large and quiet.</string>
+    <string name="widget_clock_analog_label">Analog Clock</string>
+    <string name="widget_clock_analog_desc">A classic watch face with hour and minute hands.</string>
+    <string name="widget_date_card_label">Date Card</string>
+    <string name="widget_date_card_desc">A large date with the weekday, month and year.</string>
+    <string name="widget_battery_ring_label">Battery Ring</string>
+    <string name="widget_battery_ring_desc">Your real battery level and charging state in a circular gauge.</string>
+    <string name="widget_battery_bar_label">Battery Bar</string>
+    <string name="widget_battery_bar_desc">A slim battery bar with percentage and charging status.</string>
 </resources>

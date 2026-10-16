@@ -23,5 +23,87 @@
             </intent-filter>
         </activity>
 
+        <!-- ================= Home-screen widgets ================= -->
+
+        <receiver
+            android:name=".widgets.clock.DigitalClockWidgetProvider"
+            android:exported="true"
+            android:label="@string/widget_clock_digital_label">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_clock_digital_info" />
+        </receiver>
+
+        <receiver
+            android:name=".widgets.clock.MinimalClockWidgetProvider"
+            android:exported="true"
+            android:label="@string/widget_clock_minimal_label">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_clock_minimal_info" />
+        </receiver>
+
+        <receiver
+            android:name=".widgets.clock.AnalogClockWidgetProvider"
+            android:exported="true"
+            android:label="@string/widget_clock_analog_label">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_clock_analog_info" />
+        </receiver>
+
+        <receiver
+            android:name=".widgets.clock.DateCardWidgetProvider"
+            android:exported="true"
+            android:label="@string/widget_date_card_label">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_date_card_info" />
+        </receiver>
+
+        <receiver
+            android:name=".widgets.battery.BatteryRingWidgetProvider"
+            android:exported="true"
+            android:label="@string/widget_battery_ring_label">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="android.intent.action.POWER_CONNECTED" />
+                <action android:name="android.intent.action.POWER_DISCONNECTED" />
+                <action android:name="android.intent.action.BATTERY_LOW" />
+                <action android:name="android.intent.action.BATTERY_OKAY" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_battery_ring_info" />
+        </receiver>
+
+        <receiver
+            android:name=".widgets.battery.BatteryBarWidgetProvider"
+            android:exported="true"
+            android:label="@string/widget_battery_bar_label">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="android.intent.action.POWER_CONNECTED" />
+                <action android:name="android.intent.action.POWER_DISCONNECTED" />
+                <action android:name="android.intent.action.BATTERY_LOW" />
+                <action android:name="android.intent.action.BATTERY_OKAY" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_battery_bar_info" />
+        </receiver>
+
     </application>
 </manifest>

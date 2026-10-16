@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ImageView
+        android:id="@+id/surface"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:importantForAccessibility="no"
+        android:scaleType="fitXY"
+        android:src="@drawable/widget_surface_default" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingHorizontal="12dp"
+        android:paddingVertical="8dp">
+
+        <TextView
+            android:id="@+id/percent"
+            android:layout_width="56dp"
+            android:layout_height="wrap_content"
+            android:autoSizeMaxTextSize="26sp"
+            android:autoSizeMinTextSize="10sp"
+            android:autoSizeTextType="uniform"
+            android:gravity="center_vertical"
+            android:includeFontPadding="false"
+            android:maxLines="1"
+            android:text="--"
+            android:textColor="#FF1F1D19"
+            android:textStyle="bold" />
+
+        <ImageView
+            android:id="@+id/bar"
+            android:layout_width="0dp"
+            android:layout_height="20dp"
+            android:layout_marginHorizontal="8dp"
+            android:layout_weight="1"
+            android:importantForAccessibility="no"
+            android:scaleType="fitXY" />
+
+        <TextView
+            android:id="@+id/status"
+            android:layout_width="88dp"
+            android:layout_height="wrap_content"
+            android:autoSizeMaxTextSize="13sp"
+            android:autoSizeMinTextSize="8sp"
+            android:autoSizeTextType="uniform"
+            android:gravity="center_vertical|end"
+            android:includeFontPadding="false"
+            android:maxLines="2"
+            android:textColor="#FF55514A" />
+    </LinearLayout>
+</FrameLayout>

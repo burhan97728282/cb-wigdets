@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="320dp"
+    android:height="320dp"
+    android:viewportWidth="200"
+    android:viewportHeight="200">
+
+    <!-- metal bezel -->
+    <path android:pathData="M100,100m-98,0a98,98 0,1 1,196 0a98,98 0,1 1,-196 0">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:endX="170"
+                android:endY="190"
+                android:startX="30"
+                android:startY="10"
+                android:type="linear">
+                <item android:color="#FFF2F4F6" android:offset="0.0" />
+                <item android:color="#FF7F8691" android:offset="1.0" />
+            </gradient>
+        </aapt:attr>
+    </path>
+
+    <!-- recessed ring between bezel and face -->
+    <path android:pathData="M100,100m-91,0a91,91 0,1 1,182 0a91,91 0,1 1,-182 0">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:endX="170"
+                android:endY="190"
+                android:startX="30"
+                android:startY="10"
+                android:type="linear">
+                <item android:color="#FF6E7480" android:offset="0.0" />
+                <item android:color="#FFE9ECEF" android:offset="1.0" />
+            </gradient>
+        </aapt:attr>
+    </path>
+
+    <!-- ivory face -->
+    <path android:pathData="M100,100m-88,0a88,88 0,1 1,176 0a88,88 0,1 1,-176 0">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:centerX="100"
+                android:centerY="100"
+                android:gradientRadius="88"
+                android:type="radial">
+                <item android:color="#FFFCFBF8" android:offset="0.0" />
+                <item android:color="#FFE4E0D6" android:offset="1.0" />
+            </gradient>
+        </aapt:attr>
+    </path>
+
+    <!-- minute ticks -->
+    <path
+        android:pathData="M141.00,28.99 L136.50,36.78 M171.01,59.00 L163.22,63.50 M171.01,141.00 L163.22,136.50 M141.00,171.01 L136.50,163.22 M59.00,171.01 L63.50,163.22 M28.99,141.00 L36.78,136.50 M28.99,59.00 L36.78,63.50 M59.00,28.99 L63.50,36.78"
+        android:strokeColor="#FF55514A"
+        android:strokeLineCap="round"
+        android:strokeWidth="2" />
+
+    <!-- hour ticks -->
+    <path
+        android:pathData="M100.00,18.00 L100.00,34.00 M182.00,100.00 L166.00,100.00 M100.00,182.00 L100.00,166.00 M18.00,100.00 L34.00,100.00"
+        android:strokeColor="#FF1F1D19"
+        android:strokeLineCap="round"
+        android:strokeWidth="4" />
+</vector>
