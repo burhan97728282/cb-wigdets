@@ -60,8 +60,18 @@ data class WidgetSpec(
     val defaultMaterial: WidgetMaterial? = null,
     val featured: Boolean = false,
     val popular: Boolean = false,
-    /** Flipped to true when the real home-screen widget ships. */
-    val implemented: Boolean = false
+    /** True when a real home-screen widget ships for this entry. */
+    val implemented: Boolean = id in LiveWidgetIds
+)
+
+/** Widgets that exist as real Android home-screen widgets. Keep in sync with LiveWidgets in the widgets package. */
+val LiveWidgetIds: Set<String> = setOf(
+    "clock_digital",
+    "clock_minimal",
+    "clock_analog",
+    "date_card",
+    "battery_ring",
+    "battery_bar"
 )
 
 fun WidgetSpec.defaultStyle(userDefault: WidgetMaterial): WidgetStyle =

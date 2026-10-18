@@ -3,7 +3,7 @@
 Android home-screen widget collection with a skeuomorphic design language.
 Kotlin, Jetpack Compose, Hilt, DataStore. minSdk 26.
 
-> Status: Phase 3 (skeuomorphic design system and main screens). Real home-screen widgets arrive from Phase 4.
+> Status: Phase 4A. Real home-screen widgets: Digital, Minimal and Analog Clock, Date Card, Battery Ring and Battery Bar.
 
 ## Build the APK with GitHub Actions
 1. Push to `main`.

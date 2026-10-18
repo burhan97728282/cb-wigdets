@@ -1,11 +1,14 @@
 package com.cb.widgets.feature.settings
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.cb.widgets.core.data.SettingsRepository
 import com.cb.widgets.core.data.ThemeMode
 import com.cb.widgets.core.widgetkit.WidgetMaterial
+import com.cb.widgets.widgets.common.WidgetUpdater
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
@@ -14,7 +17,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
-    private val repository: SettingsRepository
+    private val repository: SettingsRepository,
+    @ApplicationContext private val appContext: Context
 ) : ViewModel() {
 
     val themeMode: StateFlow<ThemeMode> = repository.themeMode
@@ -35,7 +39,11 @@ class SettingsViewModel @Inject constructor(
     }
 
     fun setDefaultMaterial(material: WidgetMaterial) {
-        viewModelScope.launch { repository.setDefaultMaterial(material) }
+        viewModelScope.launch {
+            repository.setDefaultMaterial(material)
+            // Placed widgets follow the default material, so redraw them right away.
+            WidgetUpdater.refreshAll(appContext)
+        }
     }
 
     fun replayOnboarding() {

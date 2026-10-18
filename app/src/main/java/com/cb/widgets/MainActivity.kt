@@ -14,12 +14,19 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.cb.widgets.core.design.CbTheme
 import com.cb.widgets.core.design.isDarkFor
 import com.cb.widgets.navigation.CbApp
+import com.cb.widgets.widgets.common.WidgetUpdater
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
     private val viewModel: MainViewModel by viewModels()
+
+    override fun onStart() {
+        super.onStart()
+        // Battery widgets can be up to 15 minutes old; opening the app brings them up to date.
+        WidgetUpdater.refreshAllAsync(applicationContext)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         val splash = installSplashScreen()
