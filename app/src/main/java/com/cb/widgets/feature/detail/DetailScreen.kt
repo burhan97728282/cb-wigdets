@@ -26,6 +26,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -43,6 +44,7 @@ import com.cb.widgets.core.design.SkeuSurface
 import com.cb.widgets.core.design.SkeuTag
 import com.cb.widgets.core.design.SkeuTopBar
 import com.cb.widgets.core.widgetkit.WidgetMaterial
+import com.cb.widgets.widgets.WidgetPinner
 import kotlin.math.roundToInt
 
 private val AccentChoices = listOf(
@@ -60,6 +62,7 @@ fun DetailScreen(
     viewModel: DetailViewModel = hiltViewModel()
 ) {
     val palette = LocalSkeu.current
+    val context = LocalContext.current
     val spec = viewModel.spec
     val style by viewModel.style.collectAsStateWithLifecycle()
     val favorite by viewModel.isFavorite.collectAsStateWithLifecycle()
@@ -177,7 +180,11 @@ fun DetailScreen(
             Spacer(Modifier.height(20.dp))
             SkeuButton(
                 text = "Add to Home Screen",
-                onClick = { showHowTo = true },
+                onClick = {
+                    // Android always shows its own confirmation. If the launcher cannot, fall back to instructions.
+                    val result = WidgetPinner.requestPin(context, spec.id)
+                    if (result != WidgetPinner.Result.REQUESTED) showHowTo = true
+                },
                 primary = true,
                 enabled = spec.implemented,
                 icon = Icons.Outlined.AddToHomeScreen,
@@ -189,14 +196,16 @@ fun DetailScreen(
                 onClick = { showHowTo = true },
                 modifier = Modifier.fillMaxWidth()
             )
-            if (!spec.implemented) {
-                Spacer(Modifier.height(10.dp))
-                Text(
-                    "This widget is not released yet. You can already explore and style it.",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = palette.textSecondary
-                )
-            }
+            Spacer(Modifier.height(10.dp))
+            Text(
+                if (spec.implemented) {
+                    "Real widgets use the default material from Settings for now. Per-widget customization is coming in an update."
+                } else {
+                    "This widget is not released yet. You can already explore and style it."
+                },
+                style = MaterialTheme.typography.bodySmall,
+                color = palette.textSecondary
+            )
             Spacer(Modifier.height(24.dp))
             Spacer(Modifier.navigationBarsPadding())
         }
