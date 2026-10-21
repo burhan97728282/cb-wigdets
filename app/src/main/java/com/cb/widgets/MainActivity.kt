@@ -12,6 +12,8 @@ import androidx.compose.runtime.getValue
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.cb.widgets.core.design.CbTheme
+import com.cb.widgets.core.diagnostics.CrashLog
+import com.cb.widgets.core.diagnostics.CrashScreen
 import com.cb.widgets.core.design.isDarkFor
 import com.cb.widgets.navigation.CbApp
 import com.cb.widgets.widgets.common.WidgetUpdater
@@ -22,13 +24,30 @@ class MainActivity : ComponentActivity() {
 
     private val viewModel: MainViewModel by viewModels()
 
+    private var showingCrashReport = false
+
     override fun onStart() {
         super.onStart()
+        if (showingCrashReport) return
         // Battery widgets can be up to 15 minutes old; opening the app brings them up to date.
         WidgetUpdater.refreshAllAsync(applicationContext)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        // Debug builds: if the last run crashed, show the error text instead of crashing again.
+        val crashReport = CrashLog.read(this)
+        if (crashReport != null) {
+            super.onCreate(savedInstanceState)
+            showingCrashReport = true
+            setContentView(
+                CrashScreen.build(this, crashReport) {
+                    CrashLog.clear(this)
+                    recreate()
+                }
+            )
+            return
+        }
+
         val splash = installSplashScreen()
         super.onCreate(savedInstanceState)
         splash.setKeepOnScreenCondition { viewModel.onboardingDone.value == null }
