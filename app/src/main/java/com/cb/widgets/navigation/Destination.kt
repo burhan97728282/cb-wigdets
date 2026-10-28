@@ -25,7 +25,13 @@ sealed class Destination(
     data object Settings : Destination("settings", "Settings", Icons.Outlined.Settings)
 
     companion object {
-        val bottomBar: List<Destination> = listOf(Home, Gallery, MyWidgets, Settings)
+        /**
+         * Must be a getter, not a stored value. The subclasses above initialise their sealed parent, which
+         * would run a stored list while Home/Gallery/... are still null and put null entries in it.
+         */
+        val bottomBar: List<Destination>
+            get() = listOf(Home, Gallery, MyWidgets, Settings)
+
         const val DETAIL_ROUTE = "detail/{id}"
         fun detail(id: String) = "detail/$id"
         fun gallery(category: String?) = if (category == null) "gallery" else "gallery?category=$category"
