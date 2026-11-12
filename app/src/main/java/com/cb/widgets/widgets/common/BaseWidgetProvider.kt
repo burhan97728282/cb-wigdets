@@ -5,6 +5,7 @@ import android.appwidget.AppWidgetProvider
 import android.content.BroadcastReceiver
 import android.content.ComponentName
 import android.content.Context
+import android.content.res.Configuration
 import android.os.Bundle
 import android.util.Log
 import android.widget.RemoteViews
@@ -33,17 +34,23 @@ abstract class BaseWidgetProvider : AppWidgetProvider() {
     suspend fun renderWidgets(context: Context, manager: AppWidgetManager, ids: IntArray) {
         if (ids.isEmpty()) return
         val app = context.applicationContext
-        val material = SettingsRepository(app).currentDefaultMaterial()
-        val style = WidgetStyle(material = material)
+        val defaultMaterial = SettingsRepository(app).currentDefaultMaterial()
+        val landscape = app.resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
         for (id in ids) {
             try {
-                val (w, h) = WidgetSizing.sizeDp(manager.getAppWidgetOptions(id), defaultWidthDp, defaultHeightDp)
+                // Each widget keeps its own look; one never customised follows the default material.
+                val style = WidgetConfigStore.load(app, id, defaultMaterial)
+                val (w, h) = WidgetSizing.sizeDp(manager.getAppWidgetOptions(id), defaultWidthDp, defaultHeightDp, landscape)
                 manager.updateAppWidget(id, buildViews(app, w, h, style))
             } catch (t: Throwable) {
                 // One broken widget must never take the others (or the app) down.
                 Log.w(TAG, "Could not render widget $id", t)
             }
         }
+    }
+
+    override fun onDeleted(context: Context, appWidgetIds: IntArray) {
+        WidgetConfigStore.delete(context, appWidgetIds)
     }
 
     override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {

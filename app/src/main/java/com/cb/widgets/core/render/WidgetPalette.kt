@@ -1,6 +1,8 @@
 package com.cb.widgets.core.render
 
 import com.cb.widgets.core.widgetkit.WidgetMaterial
+import com.cb.widgets.core.widgetkit.WidgetStyle
+import com.cb.widgets.core.widgetkit.WidgetTextMode
 
 /** Surface and ink colours of one widget material, as plain ARGB ints. */
 data class MaterialColors(
@@ -13,6 +15,26 @@ data class MaterialColors(
 
 /** Single source of truth for widget materials. Used by in-app previews AND real home-screen widgets. */
 object WidgetPalette {
+
+    private const val LIGHT_INK = 0xFFFFFFFF.toInt()
+    private const val LIGHT_INK_SECONDARY = 0xFFE9E9E9.toInt()
+    private const val DARK_INK = 0xFF14130F.toInt()
+    private const val DARK_INK_SECONDARY = 0xFF37352E.toInt()
+
+    /** Palette for a full style, including the text colour override and the no-background case. */
+    fun of(style: WidgetStyle): MaterialColors {
+        val base = of(style.material, style.opacity)
+        val mode = when {
+            style.textMode != WidgetTextMode.AUTO -> style.textMode
+            !style.showBackground -> WidgetTextMode.LIGHT
+            else -> WidgetTextMode.AUTO
+        }
+        return when (mode) {
+            WidgetTextMode.LIGHT -> base.copy(ink = LIGHT_INK, inkSecondary = LIGHT_INK_SECONDARY)
+            WidgetTextMode.DARK -> base.copy(ink = DARK_INK, inkSecondary = DARK_INK_SECONDARY)
+            WidgetTextMode.AUTO -> base
+        }
+    }
 
     fun of(material: WidgetMaterial, opacity: Float): MaterialColors {
         val o = opacity.coerceIn(0.3f, 1f)

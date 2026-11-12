@@ -22,6 +22,8 @@ object WidgetSurface {
     private const val MAX_PIXELS = 1_500_000L
 
     fun render(context: Context, widthDp: Int, heightDp: Int, widgetStyle: WidgetStyle): Bitmap {
+        // No background: a single transparent pixel, stretched by the ImageView, shows the wallpaper through.
+        if (!widgetStyle.showBackground) return Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888)
         val density = context.resources.displayMetrics.density
         var w = (widthDp.coerceAtLeast(1) * density).roundToInt().coerceAtLeast(1)
         var h = (heightDp.coerceAtLeast(1) * density).roundToInt().coerceAtLeast(1)
@@ -33,7 +35,7 @@ object WidgetSurface {
             h = (h * scale).roundToInt().coerceAtLeast(1)
         }
         val bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
-        val colors = WidgetPalette.of(widgetStyle.material, widgetStyle.opacity)
+        val colors = WidgetPalette.of(widgetStyle)
         val radius = (widgetStyle.cornerDp * density * scale).coerceAtMost(min(w, h) / 2f)
         SkeuPainter.drawRaised(
             Canvas(bitmap),
@@ -52,7 +54,7 @@ object GaugeRenderer {
         val size = (150 * density).roundToInt().coerceAtLeast(48)
         val bitmap = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(bitmap)
-        val colors = WidgetPalette.of(widgetStyle.material, widgetStyle.opacity)
+        val colors = WidgetPalette.of(widgetStyle)
 
         val stroke = size * 0.13f
         val inset = stroke / 2f + size * 0.03f
@@ -77,13 +79,13 @@ object GaugeRenderer {
         return bitmap
     }
 
-    fun bar(context: Context, widgetStyle: WidgetStyle, fraction: Float, widthDp: Int, fillArgb: Int): Bitmap {
+    fun bar(context: Context, widgetStyle: WidgetStyle, fraction: Float, widthDp: Int, heightDp: Int, fillArgb: Int): Bitmap {
         val density = context.resources.displayMetrics.density
         val w = (widthDp * density).roundToInt().coerceAtLeast(48)
-        val h = (20 * density).roundToInt().coerceAtLeast(14)
+        val h = (heightDp * density).roundToInt().coerceAtLeast(10)
         val bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(bitmap)
-        val colors = WidgetPalette.of(widgetStyle.material, widgetStyle.opacity)
+        val colors = WidgetPalette.of(widgetStyle)
 
         val well = WellColors(
             top = SkeuPainter.withAlpha(colors.ink, 0.26f),

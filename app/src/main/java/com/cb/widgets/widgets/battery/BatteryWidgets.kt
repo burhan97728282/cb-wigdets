@@ -12,6 +12,9 @@ import com.cb.widgets.widgets.common.GaugeRenderer
 import com.cb.widgets.widgets.common.WidgetIntents
 import com.cb.widgets.widgets.common.WidgetSurface
 import com.cb.widgets.widgets.common.WidgetUpdater
+import com.cb.widgets.widgets.common.setSp
+import com.cb.widgets.widgets.common.show
+import kotlin.math.min
 
 /**
  * Shared behaviour of the battery widgets.
@@ -50,17 +53,24 @@ class BatteryRingWidgetProvider : BatteryWidgetProvider() {
 
     override fun buildViews(context: Context, widthDp: Int, heightDp: Int, style: WidgetStyle): RemoteViews {
         val info = BatteryReader.read(context)
-        val c = WidgetPalette.of(style.material, style.opacity)
+        val c = WidgetPalette.of(style)
         val views = RemoteViews(context.packageName, R.layout.widget_battery_ring)
         views.setImageViewBitmap(R.id.surface, WidgetSurface.render(context, widthDp, heightDp, style))
         views.setImageViewBitmap(
             R.id.ring,
             GaugeRenderer.ring(context, style, (info?.percent ?: 0) / 100f, BatteryUi.fillColor(info, style.accentArgb))
         )
+
+        // Free space inside the ring (the ring bitmap is fitted into the widget minus a 10dp margin).
+        val hole = ((min(widthDp, heightDp) - 20f) * 0.68f).coerceAtLeast(10f)
         views.setTextViewText(R.id.percent, BatteryUi.percentText(info))
         views.setTextColor(R.id.percent, c.ink)
+        views.setSp(R.id.percent, (hole * 0.34f).coerceIn(8f, 64f))
         views.setTextViewText(R.id.status, BatteryUi.statusText(info))
         views.setTextColor(R.id.status, c.inkSecondary)
+        views.setSp(R.id.status, (hole * 0.15f).coerceIn(7f, 20f))
+        views.show(R.id.status, hole >= 50f)
+
         views.setContentDescription(R.id.root, BatteryUi.description(info))
         views.setOnClickPendingIntent(R.id.root, WidgetIntents.refresh(context, BatteryRingWidgetProvider::class.java))
         return views
@@ -73,19 +83,38 @@ class BatteryBarWidgetProvider : BatteryWidgetProvider() {
 
     override fun buildViews(context: Context, widthDp: Int, heightDp: Int, style: WidgetStyle): RemoteViews {
         val info = BatteryReader.read(context)
-        val c = WidgetPalette.of(style.material, style.opacity)
+        val c = WidgetPalette.of(style)
         val views = RemoteViews(context.packageName, R.layout.widget_battery_bar)
         views.setImageViewBitmap(R.id.surface, WidgetSurface.render(context, widthDp, heightDp, style))
-        // Width left for the bar once the percentage and status text and the padding are taken out.
-        val barWidthDp = (widthDp - 24 - 56 - 16 - 96).coerceAtLeast(48)
+
+        val statusText = BatteryUi.statusText(info)
+        val percentSp = (heightDp * 0.34f).coerceIn(11f, 48f)
+        val statusSp = (heightDp * 0.2f).coerceIn(9f, 22f)
+        // The status text needs room; narrow or very short widgets show only the percentage and the bar.
+        val showStatus = widthDp >= 190 && heightDp >= 36 && statusText.isNotEmpty()
+
+        // The bar fills whatever width is left, so estimate the text widths to size its bitmap.
+        val percentWidth = percentSp * 2.6f
+        val statusWidth = if (showStatus) statusText.length * statusSp * 0.52f else 0f
+        val barWidth = (widthDp - 20f - 16f - percentWidth - statusWidth).coerceAtLeast(24f)
+        val barHeight = (heightDp * 0.30f).coerceIn(6f, 64f)
+
         views.setImageViewBitmap(
             R.id.bar,
-            GaugeRenderer.bar(context, style, (info?.percent ?: 0) / 100f, barWidthDp, BatteryUi.fillColor(info, style.accentArgb))
+            GaugeRenderer.bar(
+                context, style, (info?.percent ?: 0) / 100f,
+                barWidth.toInt(), barHeight.toInt().coerceAtLeast(6),
+                BatteryUi.fillColor(info, style.accentArgb)
+            )
         )
         views.setTextViewText(R.id.percent, BatteryUi.percentText(info))
         views.setTextColor(R.id.percent, c.ink)
-        views.setTextViewText(R.id.status, BatteryUi.statusText(info))
+        views.setSp(R.id.percent, percentSp)
+        views.setTextViewText(R.id.status, statusText)
         views.setTextColor(R.id.status, c.inkSecondary)
+        views.setSp(R.id.status, statusSp)
+        views.show(R.id.status, showStatus)
+
         views.setContentDescription(R.id.root, BatteryUi.description(info))
         views.setOnClickPendingIntent(R.id.root, WidgetIntents.refresh(context, BatteryBarWidgetProvider::class.java))
         return views

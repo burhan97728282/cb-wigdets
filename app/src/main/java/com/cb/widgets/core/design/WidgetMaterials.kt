@@ -35,8 +35,11 @@ val LocalMaterialSpec = compositionLocalOf<MaterialSpec> {
     materialSpec(WidgetMaterial.MATTE, 1f)
 }
 
-fun materialSpec(material: WidgetMaterial, opacity: Float): MaterialSpec {
-    val c = WidgetPalette.of(material, opacity)
+fun materialSpec(material: WidgetMaterial, opacity: Float): MaterialSpec =
+    materialSpec(WidgetStyle(material = material, opacity = opacity))
+
+fun materialSpec(style: WidgetStyle): MaterialSpec {
+    val c = WidgetPalette.of(style)
     return MaterialSpec(
         raised = c.raised,
         ink = Color(c.ink),
@@ -49,6 +52,7 @@ fun materialSpec(material: WidgetMaterial, opacity: Float): MaterialSpec {
 /**
  * Draws the widget body (face, gloss, bevel) with the shared renderer.
  * No outer shadow: a real home-screen widget cannot draw outside its bounds either.
+ * With showBackground = false nothing is drawn behind the content.
  */
 @Composable
 fun WidgetFrame(
@@ -56,24 +60,29 @@ fun WidgetFrame(
     modifier: Modifier = Modifier,
     content: @Composable BoxScope.() -> Unit
 ) {
-    val spec = remember(style.material, style.opacity) { materialSpec(style.material, style.opacity) }
+    val spec = remember(style) { materialSpec(style) }
     val reduced = LocalReduceEffects.current
     val radiusPx = with(LocalDensity.current) { style.cornerDp.dp.toPx() }
+    val body = if (style.showBackground) {
+        Modifier.drawBehind {
+            drawIntoCanvas { canvas ->
+                SkeuPainter.drawRaised(
+                    canvas.nativeCanvas,
+                    RectF(0f, 0f, size.width, size.height),
+                    radiusPx, 0f, spec.raised, spec.gloss, false, reduced, spec.brushed
+                )
+            }
+        }
+    } else {
+        Modifier
+    }
     CompositionLocalProvider(
         LocalMaterialSpec provides spec,
         LocalContentColor provides spec.ink
     ) {
         Box(
             modifier = modifier
-                .drawBehind {
-                    drawIntoCanvas { canvas ->
-                        SkeuPainter.drawRaised(
-                            canvas.nativeCanvas,
-                            RectF(0f, 0f, size.width, size.height),
-                            radiusPx, 0f, spec.raised, spec.gloss, false, reduced, spec.brushed
-                        )
-                    }
-                }
+                .then(body)
                 .padding(16.dp),
             content = content
         )
