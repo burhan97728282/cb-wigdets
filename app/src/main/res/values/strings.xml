@@ -14,4 +14,11 @@
     <string name="widget_battery_ring_desc">Your real battery level and charging state in a circular gauge.</string>
     <string name="widget_battery_bar_label">Battery Bar</string>
     <string name="widget_battery_bar_desc">A slim battery bar with percentage and charging status.</string>
+
+    <string name="widget_netspeed_minimal_label">Net Speed Minimal</string>
+    <string name="widget_netspeed_minimal_desc">Your current download speed on a recessed digital display. Tap to measure.</string>
+    <string name="widget_netspeed_dual_label">Download &amp; Upload</string>
+    <string name="widget_netspeed_dual_desc">Download and upload speed side by side. Tap to measure.</string>
+    <string name="widget_wifi_status_label">Wi-Fi Status</string>
+    <string name="widget_wifi_status_desc">Whether Wi-Fi is connected, its signal strength and link rate.</string>
 </resources>
