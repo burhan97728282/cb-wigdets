@@ -71,7 +71,10 @@ val LiveWidgetIds: Set<String> = setOf(
     "clock_analog",
     "date_card",
     "battery_ring",
-    "battery_bar"
+    "battery_bar",
+    "netspeed_minimal",
+    "netspeed_dual",
+    "wifi_status"
 )
 
 fun WidgetSpec.defaultStyle(userDefault: WidgetMaterial): WidgetStyle =

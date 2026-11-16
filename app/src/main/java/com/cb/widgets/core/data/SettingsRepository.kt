@@ -9,6 +9,7 @@ import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
+import com.cb.widgets.core.metrics.SpeedUnit
 import com.cb.widgets.core.widgetkit.WidgetMaterial
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
@@ -29,6 +30,7 @@ class SettingsRepository @Inject constructor(
     private val reduceKey = booleanPreferencesKey("reduce_effects")
     private val materialKey = stringPreferencesKey("default_material")
     private val onboardingKey = booleanPreferencesKey("onboarding_done")
+    private val speedUnitKey = stringPreferencesKey("speed_unit")
     private val favoritesKey = stringSetPreferencesKey("favorites")
     private val recentsKey = stringPreferencesKey("recents")
 
@@ -49,6 +51,10 @@ class SettingsRepository @Inject constructor(
             ?: WidgetMaterial.MATTE
     }
 
+    val speedUnit: Flow<SpeedUnit> = data.map { prefs ->
+        SpeedUnit.fromName(prefs[speedUnitKey]) ?: SpeedUnit.AUTO_BITS
+    }
+
     val onboardingDone: Flow<Boolean> = data.map { it[onboardingKey] ?: false }
 
     val favorites: Flow<Set<String>> = data.map { it[favoritesKey] ?: emptySet() }
@@ -67,6 +73,10 @@ class SettingsRepository @Inject constructor(
 
     suspend fun setDefaultMaterial(material: WidgetMaterial) {
         context.settingsDataStore.edit { it[materialKey] = material.name }
+    }
+
+    suspend fun setSpeedUnit(unit: SpeedUnit) {
+        context.settingsDataStore.edit { it[speedUnitKey] = unit.name }
     }
 
     suspend fun setOnboardingDone(value: Boolean) {
@@ -94,10 +104,13 @@ class SettingsRepository @Inject constructor(
             prefs.remove(themeKey)
             prefs.remove(reduceKey)
             prefs.remove(materialKey)
+            prefs.remove(speedUnitKey)
             prefs.remove(favoritesKey)
             prefs.remove(recentsKey)
         }
     }
 
     suspend fun currentDefaultMaterial(): WidgetMaterial = defaultMaterial.first()
+
+    suspend fun currentSpeedUnit(): SpeedUnit = speedUnit.first()
 }

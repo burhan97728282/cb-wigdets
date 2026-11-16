@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.cb.widgets.core.data.SettingsRepository
 import com.cb.widgets.core.data.ThemeMode
+import com.cb.widgets.core.metrics.SpeedUnit
 import com.cb.widgets.core.widgetkit.WidgetMaterial
 import com.cb.widgets.widgets.common.WidgetUpdater
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -29,6 +30,17 @@ class SettingsViewModel @Inject constructor(
 
     val defaultMaterial: StateFlow<WidgetMaterial> = repository.defaultMaterial
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), WidgetMaterial.MATTE)
+
+    val speedUnit: StateFlow<SpeedUnit> = repository.speedUnit
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), SpeedUnit.AUTO_BITS)
+
+    fun setSpeedUnit(unit: SpeedUnit) {
+        viewModelScope.launch {
+            repository.setSpeedUnit(unit)
+            // Net Speed widgets re-format their last measurement in the new unit straight away.
+            WidgetUpdater.refreshAll(appContext)
+        }
+    }
 
     fun setThemeMode(mode: ThemeMode) {
         viewModelScope.launch { repository.setThemeMode(mode) }

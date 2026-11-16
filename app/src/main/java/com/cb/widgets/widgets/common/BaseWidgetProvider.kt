@@ -31,8 +31,12 @@ abstract class BaseWidgetProvider : AppWidgetProvider() {
 
     protected abstract fun buildViews(context: Context, widthDp: Int, heightDp: Int, style: WidgetStyle): RemoteViews
 
+    /** Runs once before the widgets are drawn. Subclasses load or measure data that every instance shares. */
+    protected open suspend fun beforeRender(context: Context) {}
+
     suspend fun renderWidgets(context: Context, manager: AppWidgetManager, ids: IntArray) {
         if (ids.isEmpty()) return
+        beforeRender(context.applicationContext)
         val app = context.applicationContext
         val defaultMaterial = SettingsRepository(app).currentDefaultMaterial()
         val landscape = app.resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE

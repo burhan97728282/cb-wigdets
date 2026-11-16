@@ -22,6 +22,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.cb.widgets.BuildConfig
 import com.cb.widgets.core.data.ThemeMode
+import com.cb.widgets.core.metrics.SpeedUnit
 import com.cb.widgets.core.design.LocalSkeu
 import com.cb.widgets.core.design.SettingRow
 import com.cb.widgets.core.design.SkeuButton
@@ -38,6 +39,7 @@ fun SettingsScreen(viewModel: SettingsViewModel = hiltViewModel()) {
     val theme by viewModel.themeMode.collectAsStateWithLifecycle()
     val reduce by viewModel.reduceEffects.collectAsStateWithLifecycle()
     val material by viewModel.defaultMaterial.collectAsStateWithLifecycle()
+    val speedUnit by viewModel.speedUnit.collectAsStateWithLifecycle()
     var confirmReset by remember { mutableStateOf(false) }
 
     Column(
@@ -86,6 +88,35 @@ fun SettingsScreen(viewModel: SettingsViewModel = hiltViewModel()) {
                 options = materials.map { it.label },
                 selectedIndex = materials.indexOf(material),
                 onSelect = { viewModel.setDefaultMaterial(materials[it]) }
+            )
+        }
+
+        Section("Network speed") {
+            Text("Show speed in", style = MaterialTheme.typography.titleMedium, color = palette.text)
+            Spacer(Modifier.height(10.dp))
+            SkeuSegmentedControl(
+                options = listOf("Bits (Mb/s)", "Bytes (MB/s)"),
+                selectedIndex = if (speedUnit.isBits) 0 else 1,
+                onSelect = { index ->
+                    viewModel.setSpeedUnit(if (index == 0) SpeedUnit.AUTO_BITS else SpeedUnit.AUTO_BYTES)
+                }
+            )
+            Spacer(Modifier.height(16.dp))
+            Text("Unit", style = MaterialTheme.typography.titleMedium, color = palette.text)
+            Spacer(Modifier.height(10.dp))
+            val choices = if (speedUnit.isBits) SpeedUnit.bitChoices else SpeedUnit.byteChoices
+            SkeuSegmentedControl(
+                options = choices.map { it.label },
+                selectedIndex = choices.indexOf(speedUnit).coerceAtLeast(0),
+                onSelect = { index -> viewModel.setSpeedUnit(choices[index]) }
+            )
+            Spacer(Modifier.height(12.dp))
+            Text(
+                "Bits are what internet providers quote (Mb/s). Bytes are what download managers show (MB/s). " +
+                    "1 byte is 8 bits, so 8 Mb/s is 1 MB/s. Units count in thousands (1 Mb = 1,000,000 bits). " +
+                    "Speeds are measured from your phone's traffic counters for all apps, not from an internet speed test.",
+                style = MaterialTheme.typography.bodySmall,
+                color = palette.textSecondary
             )
         }
 

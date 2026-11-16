@@ -3,6 +3,7 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
 
     <application
         android:name=".CbWidgetsApp"
@@ -113,6 +114,42 @@
             <meta-data
                 android:name="android.appwidget.provider"
                 android:resource="@xml/widget_battery_bar_info" />
+        </receiver>
+
+        <receiver
+            android:name=".widgets.network.NetSpeedMinimalWidgetProvider"
+            android:exported="true"
+            android:label="@string/widget_netspeed_minimal_label">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_netspeed_minimal_info" />
+        </receiver>
+
+        <receiver
+            android:name=".widgets.network.NetSpeedDualWidgetProvider"
+            android:exported="true"
+            android:label="@string/widget_netspeed_dual_label">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_netspeed_dual_info" />
+        </receiver>
+
+        <receiver
+            android:name=".widgets.network.WifiStatusWidgetProvider"
+            android:exported="true"
+            android:label="@string/widget_wifi_status_label">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_wifi_status_info" />
         </receiver>
 
     </application>
