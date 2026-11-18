@@ -1,5 +1,10 @@
 package com.cb.widgets.feature.settings
 
+import android.Manifest
+import android.content.pm.PackageManager
+import android.os.Build
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -17,6 +22,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.core.content.ContextCompat
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -40,6 +47,14 @@ fun SettingsScreen(viewModel: SettingsViewModel = hiltViewModel()) {
     val reduce by viewModel.reduceEffects.collectAsStateWithLifecycle()
     val material by viewModel.defaultMaterial.collectAsStateWithLifecycle()
     val speedUnit by viewModel.speedUnit.collectAsStateWithLifecycle()
+    val liveMode by viewModel.liveMode.collectAsStateWithLifecycle()
+    val liveInterval by viewModel.liveInterval.collectAsStateWithLifecycle()
+    val context = LocalContext.current
+    var askNotifications by remember { mutableStateOf(false) }
+    // Whether or not the user allows notifications, Live mode is started after the question was answered.
+    val notificationPermission = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) {
+        viewModel.setLiveMode(true)
+    }
     var confirmReset by remember { mutableStateOf(false) }
 
     Column(
@@ -120,6 +135,46 @@ fun SettingsScreen(viewModel: SettingsViewModel = hiltViewModel()) {
             )
         }
 
+        Section("Live net speed (optional)") {
+            SettingRow(
+                title = "Live mode",
+                subtitle = "Updates the Net Speed widgets every few seconds, only while the screen is on.",
+                trailing = {
+                    SkeuToggle(
+                        checked = liveMode,
+                        onCheckedChange = { on ->
+                            val needsPermission = on && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+                                ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) !=
+                                PackageManager.PERMISSION_GRANTED
+                            when {
+                                !on -> viewModel.setLiveMode(false)
+                                needsPermission -> askNotifications = true
+                                else -> viewModel.setLiveMode(true)
+                            }
+                        }
+                    )
+                }
+            )
+            Spacer(Modifier.height(12.dp))
+            Text("Update every", style = MaterialTheme.typography.titleMedium, color = palette.text)
+            Spacer(Modifier.height(10.dp))
+            val intervals = listOf(1, 2, 5)
+            SkeuSegmentedControl(
+                options = intervals.map { "$it s" },
+                selectedIndex = intervals.indexOf(liveInterval).coerceAtLeast(0),
+                onSelect = { viewModel.setLiveInterval(intervals[it]) }
+            )
+            Spacer(Modifier.height(12.dp))
+            Text(
+                "Android requires a small notification while Live mode runs, and you can stop it from there. " +
+                    "It uses some extra battery while the screen is on and stops by itself when the screen turns off. " +
+                    "Without Live mode, tap a Net Speed widget to measure. If your phone's battery manager stops Live " +
+                    "mode, allow CB Widgets to run in the background in your phone's battery settings.",
+                style = MaterialTheme.typography.bodySmall,
+                color = palette.textSecondary
+            )
+        }
+
         Section("Privacy") {
             Text(
                 "CB Widgets reads battery, network, storage and similar information on your phone only to draw " +
@@ -145,6 +200,21 @@ fun SettingsScreen(viewModel: SettingsViewModel = hiltViewModel()) {
                 modifier = Modifier.fillMaxWidth()
             )
         }
+    }
+
+    if (askNotifications) {
+        SkeuDialog(
+            title = "Allow a notification?",
+            text = "Live mode keeps a small notification on screen while it runs. Android requires this for anything " +
+                "that works continuously in the background. If you decline, Live mode still works, and you can stop " +
+                "it here or in your phone's running-apps list.",
+            confirmLabel = "Continue",
+            onConfirm = {
+                askNotifications = false
+                notificationPermission.launch(Manifest.permission.POST_NOTIFICATIONS)
+            },
+            onDismiss = { askNotifications = false }
+        )
     }
 
     if (confirmReset) {

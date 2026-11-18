@@ -17,6 +17,7 @@ import com.cb.widgets.core.diagnostics.CrashScreen
 import com.cb.widgets.core.design.isDarkFor
 import com.cb.widgets.navigation.CbApp
 import com.cb.widgets.widgets.common.WidgetUpdater
+import com.cb.widgets.widgets.network.NetSpeedLive
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -31,6 +32,7 @@ class MainActivity : ComponentActivity() {
         if (showingCrashReport) return
         // Battery widgets can be up to 15 minutes old; opening the app brings them up to date.
         WidgetUpdater.refreshAllAsync(applicationContext)
+        NetSpeedLive.syncAsync(applicationContext)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

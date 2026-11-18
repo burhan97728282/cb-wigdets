@@ -5,6 +5,7 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
@@ -31,6 +32,8 @@ class SettingsRepository @Inject constructor(
     private val materialKey = stringPreferencesKey("default_material")
     private val onboardingKey = booleanPreferencesKey("onboarding_done")
     private val speedUnitKey = stringPreferencesKey("speed_unit")
+    private val liveModeKey = booleanPreferencesKey("live_mode")
+    private val liveIntervalKey = intPreferencesKey("live_interval_seconds")
     private val favoritesKey = stringSetPreferencesKey("favorites")
     private val recentsKey = stringPreferencesKey("recents")
 
@@ -55,6 +58,13 @@ class SettingsRepository @Inject constructor(
         SpeedUnit.fromName(prefs[speedUnitKey]) ?: SpeedUnit.AUTO_BITS
     }
 
+    val liveModeEnabled: Flow<Boolean> = data.map { it[liveModeKey] ?: false }
+
+    /** Live mode sampling interval in seconds: 1, 2 or 5. */
+    val liveIntervalSeconds: Flow<Int> = data.map { prefs ->
+        prefs[liveIntervalKey]?.takeIf { it in LIVE_INTERVALS } ?: 2
+    }
+
     val onboardingDone: Flow<Boolean> = data.map { it[onboardingKey] ?: false }
 
     val favorites: Flow<Set<String>> = data.map { it[favoritesKey] ?: emptySet() }
@@ -77,6 +87,14 @@ class SettingsRepository @Inject constructor(
 
     suspend fun setSpeedUnit(unit: SpeedUnit) {
         context.settingsDataStore.edit { it[speedUnitKey] = unit.name }
+    }
+
+    suspend fun setLiveModeEnabled(value: Boolean) {
+        context.settingsDataStore.edit { it[liveModeKey] = value }
+    }
+
+    suspend fun setLiveIntervalSeconds(seconds: Int) {
+        if (seconds in LIVE_INTERVALS) context.settingsDataStore.edit { it[liveIntervalKey] = seconds }
     }
 
     suspend fun setOnboardingDone(value: Boolean) {
@@ -105,6 +123,8 @@ class SettingsRepository @Inject constructor(
             prefs.remove(reduceKey)
             prefs.remove(materialKey)
             prefs.remove(speedUnitKey)
+            prefs.remove(liveModeKey)
+            prefs.remove(liveIntervalKey)
             prefs.remove(favoritesKey)
             prefs.remove(recentsKey)
         }
@@ -113,4 +133,10 @@ class SettingsRepository @Inject constructor(
     suspend fun currentDefaultMaterial(): WidgetMaterial = defaultMaterial.first()
 
     suspend fun currentSpeedUnit(): SpeedUnit = speedUnit.first()
+
+    suspend fun currentLiveModeEnabled(): Boolean = liveModeEnabled.first()
+
+    companion object {
+        val LIVE_INTERVALS = listOf(1, 2, 5)
+    }
 }

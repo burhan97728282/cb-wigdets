@@ -8,6 +8,7 @@ import com.cb.widgets.core.data.ThemeMode
 import com.cb.widgets.core.metrics.SpeedUnit
 import com.cb.widgets.core.widgetkit.WidgetMaterial
 import com.cb.widgets.widgets.common.WidgetUpdater
+import com.cb.widgets.widgets.network.NetSpeedLive
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.SharingStarted
@@ -33,6 +34,24 @@ class SettingsViewModel @Inject constructor(
 
     val speedUnit: StateFlow<SpeedUnit> = repository.speedUnit
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), SpeedUnit.AUTO_BITS)
+
+    val liveMode: StateFlow<Boolean> = repository.liveModeEnabled
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), false)
+
+    val liveInterval: StateFlow<Int> = repository.liveIntervalSeconds
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), 2)
+
+    /** Switches Live mode on or off. Starting it is allowed here because the Settings screen is in the foreground. */
+    fun setLiveMode(enabled: Boolean) {
+        viewModelScope.launch {
+            repository.setLiveModeEnabled(enabled)
+            if (enabled) NetSpeedLive.start(appContext) else NetSpeedLive.stop(appContext)
+        }
+    }
+
+    fun setLiveInterval(seconds: Int) {
+        viewModelScope.launch { repository.setLiveIntervalSeconds(seconds) }
+    }
 
     fun setSpeedUnit(unit: SpeedUnit) {
         viewModelScope.launch {
@@ -63,6 +82,9 @@ class SettingsViewModel @Inject constructor(
     }
 
     fun resetPreferences() {
-        viewModelScope.launch { repository.resetPreferences() }
+        viewModelScope.launch {
+            NetSpeedLive.stop(appContext)
+            repository.resetPreferences()
+        }
     }
 }

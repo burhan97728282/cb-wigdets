@@ -35,5 +35,7 @@ object LiveWidgets {
 
     val wifi: List<LiveWidget> = all.filter { it.id == "wifi_status" }
 
+    val netSpeed: List<LiveWidget> = all.filter { it.id.startsWith("netspeed_") }
+
     fun byId(id: String): LiveWidget? = all.firstOrNull { it.id == id }
 }

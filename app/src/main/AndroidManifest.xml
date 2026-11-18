@@ -4,6 +4,9 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <application
         android:name=".CbWidgetsApp"
@@ -151,6 +154,16 @@
                 android:name="android.appwidget.provider"
                 android:resource="@xml/widget_wifi_status_info" />
         </receiver>
+
+        <!-- Optional Live mode for the Net Speed widgets. Only runs when the user switches it on in Settings. -->
+        <service
+            android:name=".widgets.network.NetSpeedLiveService"
+            android:exported="false"
+            android:foregroundServiceType="specialUse">
+            <property
+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="Optional live network speed for home screen widgets while the screen is on" />
+        </service>
 
     </application>
 </manifest>
